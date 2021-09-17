@@ -1,0 +1,9 @@
+关闭IPC$共享及其他共享
+
+既然ipc$有一定的危险性，而且对于我们大多数人来说是没啥用的，所以我们执行以下命令关闭共享
+
+1、使用命令关闭：
+
+net  share  ipc$    /delete              关闭ipc默认共享
+net  share  c$      /delete              关闭C盘默认共享
+net  share  admin$  /delete              关闭admin$默认共享

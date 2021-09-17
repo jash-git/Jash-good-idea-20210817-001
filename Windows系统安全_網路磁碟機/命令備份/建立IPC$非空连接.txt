@@ -1,0 +1,2 @@
+建立IPC$非空连接
+net use \\192.168.10.131  /u:"administrator"  "密码"

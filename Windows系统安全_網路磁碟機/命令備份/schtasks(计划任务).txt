@@ -1,0 +1,25 @@
+schtasks(计划任务)
+Windows Vista、Windows Server 2008及之后版本的操作系统已经弃用at命令，而转为用schtasks命令。schtasks命令比 at 命令更灵活。在使用schtasks命令时，会在系统中留下日志文件：C:\Windows\Tasks\SchedLgU.txt
+
+在目标主机上创建一个名为test的计划任务，启动程序为C:\vps.exe，启动权限为system，启动时间为每隔一小时启动一次
+schtasks /create /s 192.168.10.131 /tn test /sc HOURLY /mo 1 /tr c:\vps.exe /ru system /f
+
+其他启动时间参数：
+/sc onlogon  用户登录时启动
+/sc onstart  系统启动时启动
+/sc onidle   系统空闲时启动
+
+查询该test计划任务
+schtasks /query | findstr test
+
+启动该test计划任务
+schtasks /run /s 192.168.10.131 /i /tn "test"
+
+删除该test计划任务
+schtasks /delete /s 192.168.10.131 /tn "test" /f
+
+sc命令创建计划任务
+copy test.exe \\192.168.10.20\c$
+sc \\192.168.10.20 create test binpath= "c:\test.exe"
+sc \\192.168.10.20 start test
+sc \\192.168.10.20 del test

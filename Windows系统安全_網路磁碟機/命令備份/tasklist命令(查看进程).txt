@@ -1,0 +1,2 @@
+tasklist命令(查看进程)
+tasklist /S 192.168.10.131 /U administrator -P 密码
