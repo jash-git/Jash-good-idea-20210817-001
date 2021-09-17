@@ -1,0 +1,283 @@
+function loadScript_call(url, callback) {
+    if (typeof window.adsbygoogle == "undefined") {
+        var script = document.createElement('script');
+        if (script.readyState) { // IE
+            script.onreadystatechange = function() {
+                if (script.readyState === 'loaded' || script.readyState === 'complete') {
+                    script.onreadystatechange = null;
+                    callback();
+                }
+            }
+        } else { // 其他浏览器
+            script.onload = function() {
+                callback();
+            }
+        }
+        script.async = true;
+        script.src = url;
+        document.body.appendChild(script);
+    } else {
+        callback();
+    }
+}
+
+function show_google_ad() {
+    (adsbygoogle = window.adsbygoogle || []).push({});
+}
+
+function auto_ad_loader(dom_id, ad_uid, ad_id) {
+    var dom = document.getElementById(dom_id);
+    if (!dom) {
+        doms = document. getElementsByClassName(dom_id);
+        if (doms) {
+            for (i = 0; i < doms.length; i++) {
+                var ins_ad = document.createElement('ins');
+                ins_ad.setAttribute("class","adsbygoogle");
+                ins_ad.setAttribute("style","display:block");
+                ins_ad.setAttribute("data-ad-client",ad_uid)
+                ins_ad.setAttribute("data-ad-slot",ad_id)
+                ins_ad.setAttribute("data-ad-format","auto")
+                ins_ad.setAttribute("data-full-width-responsive","true")
+                doms[i].appendChild(ins_ad)
+                loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+            }
+        }
+    } else {
+            var ins_ad = document.createElement('ins');
+            ins_ad.setAttribute("class","adsbygoogle");
+            ins_ad.setAttribute("style","display:block");
+            ins_ad.setAttribute("data-ad-client",ad_uid)
+            ins_ad.setAttribute("data-ad-slot",ad_id)
+            ins_ad.setAttribute("data-ad-format","auto")
+            ins_ad.setAttribute("data-full-width-responsive","true")
+            dom.appendChild(ins_ad)
+            loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+    }
+}
+
+function fluid_ad_loader(dom_id, ad_uid, ad_id) {
+    var dom = document.getElementById(dom_id);
+    if (!dom) {
+        doms = document. getElementsByClassName(dom_id);
+        if (doms) {
+            for (i = 0; i < doms.length; i++) {
+                var ins_ad = document.createElement('ins');
+                ins_ad.setAttribute("class","adsbygoogle");
+                ins_ad.setAttribute("style","display:block; text-align:center;");
+                ins_ad.setAttribute("data-ad-layout","in-article");
+                ins_ad.setAttribute("data-ad-format","fluid");
+                ins_ad.setAttribute("data-ad-client",ad_uid)
+                ins_ad.setAttribute("data-ad-slot",ad_id)
+                doms[i].appendChild(ins_ad)
+                loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+            }
+        }
+    } else {
+            var ins_ad = document.createElement('ins');
+            ins_ad.setAttribute("class","adsbygoogle");
+            ins_ad.setAttribute("style","display:block; text-align:center;");
+            ins_ad.setAttribute("data-ad-layout","in-article");
+            ins_ad.setAttribute("data-ad-format","fluid");
+            ins_ad.setAttribute("data-ad-client",ad_uid)
+            ins_ad.setAttribute("data-ad-slot",ad_id)
+            dom.appendChild(ins_ad)
+            loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+    }
+}
+
+
+function auto_ad(ad_uid){
+        var scriptFile = document.createElement('script');
+        scriptFile.setAttribute("data-ad-client",ad_uid);
+        scriptFile.setAttribute("src",'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js');
+        document.getElementsByTagName("head")[0].appendChild(scriptFile);
+}
+
+function content_match_ad(dom_id, ad_uid, ad_id) {
+    var dom = document.getElementById(dom_id);
+    if (!dom) {
+        doms = document. getElementsByClassName(dom_id);
+        if (doms) {
+            for (i = 0; i < doms.length; i++) {
+                var ins_ad = document.createElement('ins');
+                ins_ad.setAttribute("class","adsbygoogle");
+                ins_ad.setAttribute("style","display:block;");
+                ins_ad.setAttribute("data-ad-format","autorelaxed");
+                ins_ad.setAttribute("data-ad-client",ad_uid)
+                ins_ad.setAttribute("data-ad-slot",ad_id)
+                doms[i].appendChild(ins_ad)
+                loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+            }
+        }
+    } else {
+            var ins_ad = document.createElement('ins');
+            ins_ad.setAttribute("class","adsbygoogle");
+            ins_ad.setAttribute("style","display:block;");
+            ins_ad.setAttribute("data-ad-format","autorelaxed");
+            ins_ad.setAttribute("data-ad-client",ad_uid)
+            ins_ad.setAttribute("data-ad-slot",ad_id)
+            dom.appendChild(ins_ad)
+            loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+    }
+}
+
+var hl = window.location.href;
+//if (hl.indexOf("/twnews") != -1  || hl.indexOf("/shtml/") != -1) 
+if (hl.indexOf("/twnews") != -1 || hl.indexOf("/dc_") != -1 || hl.indexOf("/shtml/") != -1) 
+{
+//动漫类不展示ad
+if (hl.indexOf("/dc_news/comic_") == -1 )
+{
+	var ad_uid = "ca-pub-1822891735294022"
+    auto_ad(ad_uid)
+    //auto_ad_loader("adsense_top",ad_uid,"9490822884")
+    //auto_ad_loader("adblock", ad_uid,"7794597836")
+    //auto_ad_loader("adblock_fluid", ad_uid,"1511619880")
+    //auto_ad_loader("adsense_wxwenku_bottom", ad_uid, "5360006187")
+    content_match_ad("adsense_wxwenku_bottom", ad_uid, "9359702235")
+   
+    if (document.body.clientWidth>1200 && document.body.clientHeight>960)
+    {
+        var odiv=document.getElementById('right_box');
+        if (odiv) {
+            //odiv.style.cssText = "position:fixed";
+        }
+        //right_ad()
+    }
+}
+}
+function loadScript_call(url, callback) {
+    if (typeof window.adsbygoogle == "undefined") {
+        var script = document.createElement('script');
+        if (script.readyState) { // IE
+            script.onreadystatechange = function() {
+                if (script.readyState === 'loaded' || script.readyState === 'complete') {
+                    script.onreadystatechange = null;
+                    callback();
+                }
+            }
+        } else { // 其他浏览器
+            script.onload = function() {
+                callback();
+            }
+        }
+        script.async = true;
+        script.src = url;
+        document.body.appendChild(script);
+    } else {
+        callback();
+    }
+}
+
+function show_google_ad() {
+    (adsbygoogle = window.adsbygoogle || []).push({});
+}
+
+function auto_ad_loader(dom_id, ad_uid, ad_id) {
+    var dom = document.getElementById(dom_id);
+    if (!dom) {
+        doms = document. getElementsByClassName(dom_id);
+        if (doms) {
+            for (i = 0; i < doms.length; i++) {
+                var ins_ad = document.createElement('ins');
+                ins_ad.setAttribute("class","adsbygoogle");
+                ins_ad.setAttribute("style","display:block");
+                ins_ad.setAttribute("data-ad-client",ad_uid)
+                ins_ad.setAttribute("data-ad-slot",ad_id)
+                ins_ad.setAttribute("data-ad-format","auto")
+                ins_ad.setAttribute("data-full-width-responsive","true")
+                doms[i].appendChild(ins_ad)
+                loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+            }
+        }
+    } else {
+            var ins_ad = document.createElement('ins');
+            ins_ad.setAttribute("class","adsbygoogle");
+            ins_ad.setAttribute("style","display:block");
+            ins_ad.setAttribute("data-ad-client",ad_uid)
+            ins_ad.setAttribute("data-ad-slot",ad_id)
+            ins_ad.setAttribute("data-ad-format","auto")
+            ins_ad.setAttribute("data-full-width-responsive","true")
+            dom.appendChild(ins_ad)
+            loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+    }
+}
+
+function fluid_ad_loader(dom_id, ad_uid, ad_id) {
+    var dom = document.getElementById(dom_id);
+    if (!dom) {
+        doms = document. getElementsByClassName(dom_id);
+        if (doms) {
+            for (i = 0; i < doms.length; i++) {
+                var ins_ad = document.createElement('ins');
+                ins_ad.setAttribute("class","adsbygoogle");
+                ins_ad.setAttribute("style","display:block; text-align:center;");
+                ins_ad.setAttribute("data-ad-layout","in-article");
+                ins_ad.setAttribute("data-ad-format","fluid");
+                ins_ad.setAttribute("data-ad-client",ad_uid)
+                ins_ad.setAttribute("data-ad-slot",ad_id)
+                doms[i].appendChild(ins_ad)
+                loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+            }
+        }
+    } else {
+            var ins_ad = document.createElement('ins');
+            ins_ad.setAttribute("class","adsbygoogle");
+            ins_ad.setAttribute("style","display:block; text-align:center;");
+            ins_ad.setAttribute("data-ad-layout","in-article");
+            ins_ad.setAttribute("data-ad-format","fluid");
+            ins_ad.setAttribute("data-ad-client",ad_uid)
+            ins_ad.setAttribute("data-ad-slot",ad_id)
+            dom.appendChild(ins_ad)
+            loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+    }
+}
+
+
+function auto_ad(ad_uid){
+        var scriptFile = document.createElement('script');
+        scriptFile.setAttribute("data-ad-client",ad_uid);
+        scriptFile.setAttribute("src",'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js');
+        document.getElementsByTagName("head")[0].appendChild(scriptFile);
+}
+
+function content_match_ad(dom_id, ad_uid, ad_id) {
+    var dom = document.getElementById(dom_id);
+    if (!dom) {
+        doms = document. getElementsByClassName(dom_id);
+        if (doms) {
+            for (i = 0; i < doms.length; i++) {
+                var ins_ad = document.createElement('ins');
+                ins_ad.setAttribute("class","adsbygoogle");
+                ins_ad.setAttribute("style","display:block;");
+                ins_ad.setAttribute("data-ad-format","autorelaxed");
+                ins_ad.setAttribute("data-ad-client",ad_uid)
+                ins_ad.setAttribute("data-ad-slot",ad_id)
+                doms[i].appendChild(ins_ad)
+                loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+            }
+        }
+    } else {
+            var ins_ad = document.createElement('ins');
+            ins_ad.setAttribute("class","adsbygoogle");
+            ins_ad.setAttribute("style","display:block;");
+            ins_ad.setAttribute("data-ad-format","autorelaxed");
+            ins_ad.setAttribute("data-ad-client",ad_uid)
+            ins_ad.setAttribute("data-ad-slot",ad_id)
+            dom.appendChild(ins_ad)
+            loadScript_call("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",show_google_ad)
+    }
+}
+
+
+var hl = window.location.href;
+if (hl.indexOf("/dl") != -1 || hl.indexOf("/pl") != -1 ) 
+{
+	var ad_uid = "ca-pub-1822891735294022"
+	auto_ad(ad_uid)
+    //auto_ad_loader("ad_top",ad_uid,"9490822884")
+    //auto_ad_loader("adblock", ad_uid,"7794597836")
+    //auto_ad_loader("adblock_fluid", ad_uid,"1511619880")
+    //auto_ad_loader("buttom_ad", ad_uid, "5360006187")
+
+}
