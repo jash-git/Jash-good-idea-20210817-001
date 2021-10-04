@@ -1,0 +1,10 @@
+GIF 01：最簡單的while 循環.gif
+GIF 02：帶if_else 的循環.gif
+GIF 03：遞歸概念的直接演示.gif
+GIF 04：遞歸的代碼示例.gif
+GIF 05：遞歸求斐波那契數列.gif
+GIF 06：遞歸求階乘.gif
+GIF 07：按值傳遞和按引用傳遞的區別.gif
+GIF 08：線性檢索和二分檢索求23 的位置.gif
+GIF 09：線性檢索和二分檢索求1 的位置.gif
+GIF 10：二分檢索樹.gif
