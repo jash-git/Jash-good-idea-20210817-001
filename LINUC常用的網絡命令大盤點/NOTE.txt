@@ -1,0 +1,15 @@
+远程登录的 ssh 指令；
+
+远程传输文件的 scp 指令；
+
+查看网络接口的 ifconfig 指令；
+
+查看网络状态的 netstat 指令；
+
+测试网络延迟的 ping 指令；
+
+可以和服务端进行交互式调试的 telnet 指令；
+
+两个 DNS 查询指令 host 和 dig；
+
+可以发送各种请求包括 HTTPS 的 curl 指令。
