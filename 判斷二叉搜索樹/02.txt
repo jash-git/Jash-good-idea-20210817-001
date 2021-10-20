@@ -1,0 +1,39 @@
+Show me the Code
+
+C++
+long pre = LONG_MIN;
+bool isValidBST(TreeNode* root) {
+    if (root == nullptr) {
+        return true;
+    }
+
+    if (!isValidBST(root->left)) {
+        return false;
+    }
+
+    if (root->val <= pre) {
+        return false;
+    }
+
+    pre = root->val; 
+    return isValidBST(root->right);      
+}
+
+Java
+long temp = Long.MIN_VALUE;
+boolean isValidBST(TreeNode root) {
+    if (root == null) {
+        return true;
+    }
+
+    if(!isValidBST(root.left)) {
+        return false;
+    }
+
+    if (root.val <= temp) {
+        return false;
+    } 
+
+    temp = root.val;
+    return isValidBST(root.right);        
+}

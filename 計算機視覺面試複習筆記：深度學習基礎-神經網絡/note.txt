@@ -1,0 +1,7 @@
+计算机视觉（三大基础任务）
+
+图像分类：VGG、GoogleNet、ResNet、SENet、Mobilenet系列
+
+目标检测：FastRCNN、YOLO、SSD、CenterNet、Detr、DetectoRS、EffiectDet
+
+图像分割：U-Net、FastFCN、DeepLab、MaskRCNN、SETR

@@ -1,0 +1,85 @@
+Show me the Code
+
+C
+bool isValidBST_Helper(struct TreeNode* root, double min, double max) {
+    /* 特殊判断 */
+    if (root == NULL) {
+        return true;
+    }
+
+    /* 当前节点不在上下界内，不是二叉搜索树 */
+    if (root->val <= min || root->val >= max) {
+        return false;
+    }
+
+    /* 判断左右子树是否是二叉搜索树 */
+    return isValidBST_Helper(root->left, min, root->val) && isValidBST_Helper(root->right, root->val, max);
+}
+
+bool isValidBST(struct TreeNode* root) {
+    return isValidBST_Helper(root, LONG_MIN, LONG_MAX);
+}
+
+C++
+bool isValidBST_Helper(TreeNode* root, double min, double max) {
+    if (root == nullptr) {
+        return true;
+    }
+
+    if (root->val <= min || root->val >= max) {
+        return false;
+    }
+
+    return isValidBST_Helper(root->left, min, root->val) && isValidBST_Helper(root->right, root->val, max);
+}
+
+bool isValidBST(TreeNode* root) {
+    return isValidBST_Helper(root, LONG_MIN, LONG_MAX);
+}
+
+Java
+boolean isValidBST_Helper(TreeNode root, double min, double max) {
+    if (root == null) {
+        return true;
+    }
+
+    if (root.val <= min || root.val >= max) {
+        return false;
+    }
+
+    return isValidBST_Helper(root.left, min, root.val) && isValidBST_Helper(root.right, root.val, max);
+}
+
+boolean isValidBST(TreeNode root) {
+    return isValidBST_Helper(root, Long.MIN_VALUE, Long.MAX_VALUE);
+}
+
+Python3
+def isValidBST(self, root: TreeNode) -> bool:
+    def isValidBST_Helper(root, min, right):
+        if root is None:
+            return True
+        
+        if root.val <= min or root.val >= right:
+            return False
+
+        return isValidBST_Helper(root.left, min, root.val) and isValidBST_Helper(root.right, root.val, right)
+
+    return isValidBST_Helper(root, -float('inf'), float('inf')) 
+
+Golang
+func isValidBST(root *TreeNode) bool {
+  return isValidBST_Helper(root, math.MinInt64, math.MaxInt64)
+}
+
+func isValidBST_Helper(root *TreeNode, min, max int) bool {
+  if root == nil {
+    return true
+  }
+
+  if min >= root.Val || max <= root.Val {
+    return false
+  }
+
+  return isValidBST_Helper(root.Left, min, root.Val) && isValidBST_Helper(root.Right, root.Val, max)
+}
