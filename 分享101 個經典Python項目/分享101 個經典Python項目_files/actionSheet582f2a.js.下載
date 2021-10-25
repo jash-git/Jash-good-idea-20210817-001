@@ -1,0 +1,422 @@
+var _extends=Object.assign||function(e){
+for(var t=1;t<arguments.length;t++){
+var r=arguments[t];
+for(var a in r)Object.prototype.hasOwnProperty.call(r,a)&&(e[a]=r[a]);
+}
+return e;
+};
+define("pages_new/common_share/video/related_video_list/related_video_list_store.js",["pages/utils.js"],function(e){
+"use strict";
+function t(e){
+var t=Math.floor(e/60),r=e-60*t;
+return 10>r&&(r="0"+r),10>t&&(t="0"+t),t+":"+r;
+}
+var r=e("pages/utils.js");
+return{
+name:"mp-related-video-list",
+namespaced:!0,
+getters:{
+hasRelatedVideoList:function(e,t,r){
+var a=r.extRes;
+return!!a.related_tag_video&&!!a.related_tag_video.length&&a.related_tag_video.length>0;
+},
+list:function(e,a,n){
+var o=n.extRes;
+return a.hasRelatedVideoList?o.related_tag_video.map(function(e){
+var a=_extends({},e,{
+album:!1,
+formatDuration:t(e.duration),
+read_num:r.formatReadNum(e.read_num||e.readcnt)
+});
+return a.read_num=""===a.read_num?0:a.read_num,a;
+}):[];
+},
+forMpVideoDataBuffer:function(e,t,r){
+var a=r.extRes;
+return a.related_video_info?a.related_video_info.push_channel_seq||"":"";
+}
+}
+};
+});var _extends=Object.assign||function(e){
+for(var n=1;n<arguments.length;n++){
+var i=arguments[n];
+for(var o in i)Object.prototype.hasOwnProperty.call(i,o)&&(e[o]=i[o]);
+}
+return e;
+};
+define("pages_new/common_share/video/lifecycle_manager.js",["biz_wap/jsapi/log.js","biz_wap/utils/ajax.js","common/utils.js","biz_wap/jsapi/core.js","biz_wap/utils/device.js","biz_common/utils/cookie.js","biz_wap/utils/mmversion.js","pages_new/modules/utils/url.js","biz_wap/jsapi/leaveReport.js","biz_wap/utils/jsmonitor_report.js","pages_new/common_share/video/report.js"],function(e){
+"use strict";
+function n(){
+return z;
+}
+function i(e){
+z=I&&e;
+}
+function o(e){
+M.setSum(221764,k.isIOS?e:e+1,1),M.send();
+}
+function t(e){
+_({
+url:e.replace(/#.*$/,"")+"&action=report",
+type:"POST",
+timeout:2e3
+});
+}
+function a(e){
+"function"==typeof e&&O.push(e);
+}
+function c(e){
+"function"==typeof e&&b.push(e);
+}
+function r(e){
+"function"==typeof e&&C.push(e);
+}
+function s(){
+O.forEach(function(e){
+return e();
+});
+}
+function l(){
+b.forEach(function(e){
+return e(!1);
+});
+}
+function f(e){
+C.forEach(function(n){
+return n(e);
+});
+}
+function u(e,n){
+window.ext_complete=!1,window.uin=n.uin||window.uin||"",window.key=n.key||window.key||"",
+window.wxtoken=n.wxtoken||window.wxtoken||"",window.pass_ticket=n.pass_ticket&&encodeURIComponent(n.pass_ticket.html(!1).html(!1).replace(/\s/g,"+"))||window.pass_ticket||"",
+window.__initGlobalData(e,n),window.__initCgiDataConfig(e,n),window.__initCommentConfig(e,n);
+}
+function p(e){
+var n=S.get("appmsg_token");
+if(n)window.appmsg_token=n||window.appmsg_token||"",console.info("[Lifecycle Manager] Update Csrf Token By Cookie",window.appmsg_token),
+y.info("[Lifecycle Manager] Update Csrf Token By Cookie",window.appmsg_token),"function"==typeof e.success&&e.success();else{
+if(o(34),k.isIOS)return void("function"==typeof e.success&&e.success());
+"function"==typeof e.error&&e.error();
+}
+}
+function d(e){
+c(e.init),a(e.destroy),r(e.getData),"function"==typeof e.init&&e.init(!0);
+}
+function g(e,n){
+z&&n&&!x[n]&&_({
+url:e.replace(/scene=\d+/g,"scene=9876").replace(/#.*$/,"")+"&action=preload",
+type:"GET",
+timeout:2e3,
+success:function(i){
+try{
+x[n]=JSON.parse(i),console.info("[Lifecycle Manager] Preload PageData",n,e,x[n]),
+y.info("[Lifecycle Manager] Preload PageData",n,e);
+}catch(o){
+console.error("[Lifecycle Manager] Parse Preload PageData Failed",n,e,o),y.error("[Lifecycle Manager] Parse Preload PageData Failed",n,e,o.toString());
+}
+x[n]&&x[n].video_page_info&&"string"==typeof x[n].video_page_info.cover_url&&((new Image).src=x[n].video_page_info.cover_url);
+}
+});
+}
+function w(e,n){
+if(!E){
+if(E=!0,console.info("[Lifecycle Manager] Start to switch to",e),y.info("[Lifecycle Manager] Start to switch to",e),
+P.add19735ExtData({
+EventType:3
+}),L.reportNow(),!z)return void m.loadNewPageKeepingHistoryStackIfSecOpen(e);
+if(k.isIOS){
+var i=e.match(/__biz=(.*?)&/);
+if(!i||i[1]!==window.biz)return void(location.href=e.replace(/#.*$/,"")+"#wechat_redirect");
+}
+var a=j.getParams(location.href),c=_extends({
+ascene:a.ascene,
+devicetype:a.devicetype,
+version:a.version,
+nettype:a.nettype,
+lang:a.lang,
+pass_ticket:a.pass_ticket
+},j.getParams(e)),r=3e3,d=2,g=0,w=null;
+document.cookie="appmsg_token=;path=/",s();
+var h=function(){
+g===d&&(w&&w.base_resp&&0===w.base_resp.ret?(x={},l(),E=!1,t(e),o(30),console.info("[Lifecycle Manager] Finish to switch to",e),
+y.info("[Lifecycle Manager] Finish to switch to",e)):m.loadNewPageKeepingHistoryStackIfSecOpen(e));
+},S=setTimeout(function(){
+o(32),location.href===e?location.reload():m.loadNewPageKeepingHistoryStackIfSecOpen(e);
+},r),M=function b(n){
+document.removeEventListener("WeixinJSBridgeAuthChanged",b),console.info("[Lifecycle Manager] GetA8Key Success",n.state),
+y.info("[Lifecycle Manager] GetA8Key Success",n.state),history.replaceState(null,"",n.fullUrl),
+clearTimeout(S),k.isIOS&&(window.__second_open__=D),p({
+url:e,
+success:function(){
+g++,h();
+},
+error:function(){
+m.loadNewPageKeepingHistoryStackIfSecOpen(e);
+}
+});
+};
+document.addEventListener("WeixinJSBridgeAuthChanged",M),history.replaceState(null,"",e);
+var O=function C(){
+k.isAndroid&&document.removeEventListener("WeixinJSBridgeSpaHistoryChanged",C),console.info("[Lifecycle Manager] History Stack Changed"),
+y.info("[Lifecycle Manager] History Stack Changed"),k.isIOS&&(D=window.__second_open__),
+delete window.__second_open__,v.invoke("doAuthCurrentUrl",{},function(n){
+n&&n.err_msg&&-1!==n.err_msg.indexOf(":ok")?(console.info("[Lifecycle Manager] Invoke GetA8Key Success",n),
+y.info("[Lifecycle Manager] Invoke GetA8Key Success",JSON.stringify(n))):(console.error("[Lifecycle Manager] Invoke GetA8Key Failed",n),
+y.error("[Lifecycle Manager] Invoke GetA8Key Failed",JSON.stringify(n)),clearTimeout(S),
+m.loadNewPageKeepingHistoryStackIfSecOpen(e));
+});
+};
+k.isAndroid?document.addEventListener("WeixinJSBridgeSpaHistoryChanged",O):O(),n&&x[n]?(console.info("[Lifecycle Manager] Get Cache PageData",n),
+y.info("[Lifecycle Manager] Get Cache PageData",n),w=x[n],u(w,c),f(w),g++,h()):_({
+url:e.replace(/scene=\d+/g,"scene=9875").replace(/#.*$/,"")+"&action=preload",
+type:"GET",
+async:!1,
+timeout:2e3,
+success:function(n){
+try{
+w=JSON.parse(n),console.info("[Lifecycle Manager] Get PageData",w),y.info("[Lifecycle Manager] Get PageData");
+}catch(i){
+console.error("[Lifecycle Manager] Parse PageData Failed",e,i),y.error("[Lifecycle Manager] Parse PageData Failed",e,i.toString());
+}
+w&&(u(w,c),f(w)),g++,h();
+},
+error:function(){
+m.loadNewPageKeepingHistoryStackIfSecOpen(e);
+}
+});
+}
+}
+var y=e("biz_wap/jsapi/log.js"),_=e("biz_wap/utils/ajax.js"),m=e("common/utils.js"),v=e("biz_wap/jsapi/core.js"),h=e("biz_wap/utils/device.js"),S=e("biz_common/utils/cookie.js"),k=e("biz_wap/utils/mmversion.js"),j=e("pages_new/modules/utils/url.js"),L=e("biz_wap/jsapi/leaveReport.js"),M=e("biz_wap/utils/jsmonitor_report.js"),P=e("pages_new/common_share/video/report.js"),O=[],b=[],C=[],I=window.top===window&&k.isWechat&&!k.isInMiniProgram&&!window.is_teenager&&(h.os.iphone&&k.gtVersion("8.0.3",1)||h.os.android&&k.gtVersion("8.0.1",1)),z=!1,E=!1,x={},D=void 0;
+return I&&k.isIOS&&(console.info("[Lifecycle Manager] Overwrite sys:auth"),y.info("[Lifecycle Manager] Overwrite sys:auth"),
+v.on("sys:auth",function(e){
+console.info("[Lifecycle Manager] Get sys:auth Event",e),y.info("[Lifecycle Manager] Get sys:auth Event",JSON.stringify(e));
+var n=document.createEvent("Events");
+n.initEvent("WeixinJSBridgeAuthChanged"),n.state=e.state,n.fullUrl=e.fullUrl,document.dispatchEvent(n);
+})),{
+isSpaMode:n,
+setSpaMode:i,
+register:d,
+openNewVideoPage:w,
+preloadNewVideoPageData:g
+};
+});function _typeof(e){
+return e&&"undefined"!=typeof Symbol&&e.constructor===Symbol?"symbol":typeof e;
+}
+define("pages_new/modules/utils/url.js",[],function(){
+"use strict";
+var e=function(e){
+var n=[],t={};
+if(!e)try{
+e=window.top.location,n=e.search.substring(1).split("&");
+}catch(o){
+e=window.location,n=e.search.substring(1).split("&");
+}
+"string"==typeof e&&(e=new URL(e),n=e.search.substring(1).split("&"));
+for(var r=0;r<n.length;r++){
+var i=n[r].split("="),s=decodeURIComponent(i.shift());
+"undefined"==typeof t[s]&&(t[s]=decodeURIComponent(i.join("=")));
+}
+return t;
+},n=function(e,n,t){
+return"string"!=typeof e?"":(n&&"object"===("undefined"==typeof n?"undefined":_typeof(n))&&Object.keys(n).length&&(e+="?"+Object.keys(n).map(function(e){
+return e+"="+encodeURIComponent(n[e]);
+}).join("&")),t&&"string"==typeof t&&(e+="#"+t),e);
+};
+return{
+getParams:e,
+genUrl:n
+};
+});;define('widget/wx-widget/wx_emotion_panel.css', [], function(require, exports, module) {
+	return ".comment_primary_emotion_list_mobile{padding:8px 0;overflow-y:scroll}.comment_primary_emotion_item{float:left;padding:4px;cursor:pointer;list-style:none}.comment_primary_emotion_item:hover{background-color:#f7f7f7}.comment_primary_emotion{display:block;width:24px;height:24px;background:transparent url(\/mmbizwap\/zh_CN\/htmledition\/images\/icon\/common\/emotion_panel\/icon_emotion_panel.2x55871f.png) no-repeat 0 0;background-size:24px}@media(prefers-color-scheme:dark){.comment_primary_emotion_item:hover{background-color:#202020}}";
+});define("appmsg/comment/comment_input/comment_input.html.js",[],function(){
+return'<div class="comment_primary_input_area js_wrp" style="display: none">\n  <# if (deviceIsPc) { #>\n    <!-- PC端 -->\n    <div class="comment_primary_input_wrp">\n      <div class="comment_primary_input js_input" contenteditable></div>\n      <div class="comment_primary_input_placeholder js_placeholder"><#=placeholder#></div>\n    </div>\n    <div class="comment_primary_tool js_tool">\n      <button disabled="disabled" class="reset_btn comment_primary_btn js_submit"><#=submitText#></button>\n      <div class="comment_primary_emotion_wrp js_emotion_wrp">\n        <span class="icon_comment_primary_emotion"></span>\n      </div>\n      <!-- 超出字数往comment_primary_counter加comment_primary_counter_warn  -->\n      <span class="comment_primary_counter js_counter" style="display: none">\n        <em class="js_counter_len"></em>\n        /\n        <span><#=length#></span>\n      </span>\n    </div>\n  <# } else { #>\n    <!-- 手机端 -->\n    <div class="discuss_textarea_box">\n      <textarea class="discuss_textarea js_input js_placeholder" placeholder="<#=placeholder#>"></textarea>\n      <div class="emotion_tool">\n        <span class="pic_emotion_switch_wrp js_emotion_wrp">\n          <img class="pic_default" src="<#=iconEmotionSwitch#>" alt="">\n          <img class="pic_active" src="<#=iconEmotionSwitchActive#>" alt="">\n          <img class="pic_default_primary" src="<#=iconEmotionSwitchPrimary#>" alt="">\n          <img class="pic_active_primary" src="<#=iconEmotionSwitchActivePrimary#>" alt="">\n        </span>\n      </div>\n    </div>\n\n    <div class="emotion_panel js_emotion_panel">\n      <span class="emotion_panel_arrow_wrp js_emotion_panel_arrow_wrp">\n        <i class="emotion_panel_arrow arrow_out"></i>\n        <i class="emotion_panel_arrow arrow_in"></i>\n      </span>\n      <div class="emotion_list_wrp js_slide_wrapper"></div>\n      <ul class="emotion_navs js_navbar"></ul>\n    </div>\n\n    <div class="discuss_btn_wrp js_tool">\n      <button disabled="disabled" class="weui-btn weui-btn_primary js_submit">留言</button>\n    </div>\n  <# } #>\n</div>\n';
+});define("appmsg/emotion/selection.js",[],function(e,n){
+"use strict";
+function t(e,n,t){
+if(!t&&e===n)return!1;
+if(e.compareDocumentPosition){
+var o=e.compareDocumentPosition(n);
+if(20===o||0===o)return!0;
+}else if(e.contains(n))return!0;
+return!1;
+}
+function o(e,n){
+var o=n.commonAncestorContainer||n.parentElement&&n.parentElement()||null;
+return o?t(e,o,!0):!1;
+}
+n.getSelection=function(){
+return document.selection?document.selection:(window.getSelection||document.getSelection)();
+},n.getRange=function(e){
+var n=getSelection();
+if(!n)return null;
+var t=void 0;
+return n.getRangeAt&&n.rangeCount?t=n.getRangeAt(0):n.getRangeAt||(t=n.createRange()),
+t?e&&o(e,t)?t:e?null:t:null;
+},n.setCursorToEnd=function(e){
+if(e){
+var n=getSelection();
+n.extend&&(n.extend(e,e.length),n.collapseToEnd&&n.collapseToEnd());
+}
+},n.contains=t;
+});define("appmsg/comment/comment_dialog/comment_dialog.html.js",[],function(){
+return'<# if (deviceIsPc) { #>\n  <!-- PC自己写一个dialog并追加到body -->\n  <div class="discuss_more_pc_dialog_wrp js_comment_dialog_pc" style="display: none;">\n    <div class="discuss_more_pc_dialog">\n      <div class="discuss_more_pc_dialog_hd">\n        <strong class="discuss_more_pc_dialog_title">留言</strong>\n        <button class="discuss_more_pc_dialog_close_btn reset_btn js_close">\n          <i class="weui-icon-close"></i>\n        </button>\n      </div>\n      <div class="discuss_more_pc_dialog_bd js_bd">\n        <div class="js_bd_main">\n          <div class="discuss_media_current js_comment_list"></div> <!-- 留言列表 -->\n          <div class="discuss_more_list_area">\n            <div class="discuss_more_list_title">全部回复</div>\n            <ul class="discuss_more_list js_reply_list"></ul> <!-- 回复列表 -->\n\n            <div class="js_loading" style="display: none;">\n              <div class="weui-loadmore weui-loadmore_default">\n                <i class="weui-primary-loading"></i>\n                <span class="weui-loadmore__tips">正在加载</span>\n              </div>\n            </div>\n\n            <!-- 结束线 -->\n            <div style="display: none;">\n              <div class="weui-loadmore weui-loadmore_default weui-loadmore_line weui-loadmore_dot">\n                <span class="weui-loadmore__tips"></span>\n              </div>\n            </div>\n\n            <div class="js_empty" style="display: none;">\n              <div class="weui-loadmore weui-loadmore_default">\n                <span class="weui-loadmore__tips">暂无回复</span>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class="weui-mask"></div>\n  </div>\n<# } else { #>\n  <!-- 手机端基于bottom_modal组件 -->\n  <div class="js_bd discuss_more_dialog_content">\n    <div class="discuss_more_dialog_content_bd">\n      <div class="discuss_media_current js_comment_list"></div> <!-- 留言列表 -->\n      <div class="discuss_more_list_area">\n        <div class="discuss_more_list_wrp">\n          <div class="discuss_more_list_title">全部回复</div>\n          <div class="discuss_more_list js_reply_list"></div> <!-- 回复列表 -->\n        </div>\n\n        <div class="js_loading" style="display: none;">\n          <div class="weui-loadmore weui-loadmore_default">\n            <i class="weui-primary-loading"></i>\n            <span class="weui-loadmore__tips">正在加载</span>\n          </div>\n        </div>\n\n        <!-- 结束线 -->\n        <div class="js_end" style="display: none;">\n          <div class="weui-loadmore weui-loadmore_default weui-loadmore_line weui-loadmore_dot">\n            <span class="weui-loadmore__tips"></span>\n          </div>\n        </div>\n\n        <!-- 无回复 -->\n        <div class="js_empty" style="display: none;">\n          <div class="tips_global_primary discuss_more_empty_tips">\n            暂无回复          </div>\n        </div>\n      </div>\n    </div>\n    <div class="discuss_more_dialog_content_ft">\n      <div class="discuss_more_form weui-flex js_reply_btn">\n        <div class="weui-flex__item">\n          <div class="discuss_form_input js_placeholder" role="option"></div>\n        </div>\n        <a class="icon_discuss_emotion js_emotion_btn" role="button" aria-label="表情" title="轻点两下打开表情键盘" href="javascript:;"></a>\n      </div>\n    </div>\n  </div>\n<# } #>\n';
+});define("appmsg/comment/comment_dialog/c2c_not_support_dialog.html.js",[],function(){
+return'<!-- 不支持c2c回复弹窗，基于bottom_modal组件 -->\n\n<!-- bd部分 -->\n<div class="js_bd discuss_more_guide">\n  <p class="discuss_more_guide_tips">更新微信到最新版本，可以回复他人留言</p>\n  <img class="pic_discuss_more_guide" src="<#= comment_c2c_not_support_img #>" alt="">\n</div>\n\n<!-- ft部分 -->\n<div class="js_ft">\n  <a href="javascript:;" class="weui-btn weui-btn_default js_close">知道了</a>\n  <a href="javascript:;" class="weui-btn weui-btn_primary js_update">去更新</a>\n</div>\n';
+});function _classCallCheck(t,o){
+if(!(t instanceof o))throw new TypeError("Cannot call a class as a function");
+}
+var _createClass=function(){
+function t(t,o){
+for(var e=0;e<o.length;e++){
+var i=o[e];
+i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(t,i.key,i);
+}
+}
+return function(o,e,i){
+return e&&t(o.prototype,e),i&&t(o,i),o;
+};
+}();
+define("appmsg/emotion/emotion_pc.js",["biz_common/utils/emoji_data.js","biz_common/utils/emoji_panel_data.js","biz_common/dom/event.js","appmsg/emotion/emotion.js","common/utils.js","biz_wap/utils/mmversion.js","pages/utils.js","biz_common/tmpl.js","appmsg/emotion/emotion_pc.html.js"],function(t,o,e){
+"use strict";
+var i=t("biz_common/utils/emoji_data.js"),n=t("biz_common/utils/emoji_panel_data.js"),s=t("biz_common/dom/event.js"),a=t("appmsg/emotion/emotion.js").encode,m=t("common/utils.js"),l=t("biz_wap/utils/mmversion.js"),c=t("pages/utils.js"),r=t("biz_common/tmpl.js"),d=t("appmsg/emotion/emotion_pc.html.js"),h="js_emotion_item",u=m.getInnerHeight(),p=13,v=13,f=25.5,j=function(){
+function t(o){
+_classCallCheck(this,t),this.edata=[],this.emojiText={},this.isShow=!1,this.onSelect=o.onSelect,
+this.initEmotionData();
+var e=document.createElement("div");
+e.innerHTML=r.tmpl(d,{
+list:this.edata
+},!1);
+var i=c.qs(".js_emotion_panel",e);
+document.body.appendChild(i),this.dom={
+emotionSwitch:o.emotionSwitch,
+emotionPanel:i,
+emotionList:c.qs(".js_emotion_list",i),
+input:o.input,
+submit:o.submit,
+tool:o.tool
+},this.bindEvent();
+}
+return _createClass(t,[{
+key:"initEmotionData",
+value:function(){
+var t=this,o=[];
+n.forEach(function(t,e){
+i.some(function(i){
+return i.id===t?(o[e]=i,!0):!1;
+});
+});
+for(var e=0;v>e;e++)for(var s=0;p>s;s++){
+var a=e*p+s;
+o[a]&&this.edata.push({
+name:o[a].style,
+title:o[a].emoji?o[a].emoji:o[a].cn,
+bp:"background-position: 0 -"+a*f+"px;",
+id:o[a].id
+});
+}
+o.forEach(function(o){
+t.emojiText[o.style]=o.emoji||o.cn;
+});
+}
+},{
+key:"bindEvent",
+value:function(){
+var t=this;
+s.on(window,"resize",this.emotionPanelMove),s.tap(this.dom.emotionSwitch,function(){
+t[t.isShow?"hide":"show"]();
+}),s.tap(this.dom.emotionList,function(o){
+for(var e=o.target;e&&e!==t.dom.emotionList&&!e.classList.contains(h);)e=e.parentNode;
+e.classList.contains(h)&&"function"==typeof t.onSelect&&t.onSelect(t.edata[e.dataset.index]);
+});
+}
+},{
+key:"show",
+value:function(){
+this.isShow=!0;
+var t=this.dom.emotionPanel;
+t.style.display="",this.zoomEmotionPanel();
+var o=t.getBoundingClientRect();
+o.top+o.height>=u&&window.scrollTo(0,window.scrollY+o.height);
+}
+},{
+key:"hide",
+value:function(){
+this.isShow=!1,this.dom.emotionPanel.style.display="none";
+}
+},{
+key:"zoomEmotionPanel",
+value:function(){
+var t=this.dom.emotionPanel,o=window.getComputedStyle(c.qs(".rich_media_tool")).zoom,e=this.dom.tool.getBoundingClientRect();
+t.style.left=e.right*o+"px",t.style.transform="translateX(-100%)",l.isWindows?t.style.top=window.scrollY+e.top*o+e.height*o+"px":l.isMac&&(t.style.top=(window.scrollY+e.top+e.height)*o+"px");
+}
+},{
+key:"emotionPanelMove",
+value:function(){
+this.isShow&&this.zoomEmotionPanel();
+}
+},{
+key:"textFilter",
+value:function(t){
+var o=document.createElement("div");
+o.innerHTML=t;
+for(var e="",i="",n=[],s=void 0,a=0;a<o.childNodes.length;a++){
+var m=o.childNodes[a];
+1===m.nodeType&&("IMG"===m.nodeName.toUpperCase()||"I"===m.nodeName.toUpperCase())&&(i=m.getAttribute("class"),
+i&&(n=i.split(" "),n.length>1&&"icon_emotion_single"===n[0]&&(e=this.emojiText[n[1]],
+s=document.createTextNode(e),o.replaceChild(s,m))));
+}
+return o.innerHTML.replace(/<br.*?>/gi,"\n").replace(/<.*?>/g,"");
+}
+}]),t;
+}();
+e.exports={
+Emotion:j,
+encode:a
+};
+});define("appmsg/comment/comment_list/item.html.js",[],function(){
+return'<div class="discuss_media js_item <# if (itemType === \'reply\') { #> js_reply_item <# } else { #> js_comment_main <# } #>\n  <# if (!item.is_from_author) { #> discuss_media_user<# } #>\n  <# if (canC2CReply || (!canC2CReply && itemType === \'comment\' && item.is_from_me == 1)) { #> js_can_reply<# } #>\n  <# if (item.needAnimation) { #> discuss_new_show<# } #>\n  "\n\n  <# if (isOversize) { #> style="display: none;" <# } #>\n\n  <# if (itemType === \'comment\') { #>\n    data-my-id="<#=item.my_id#>"\n    data-content-id="<#=item.content_id#>"\n  <# } else { #>\n    data-my-id="<#=my_id#>"\n    data-content-id="<#=content_id#>"\n    data-reply-id="<#=item.reply_id#>"\n  <# } #>\n>\n  <div class="discuss_hd">\n    <img alt="" class="discuss_user_avatar" src="<#=item.logo_url#>">\n  </div>\n  <div class="discuss_bd">\n    <div class="discuss_overview weui-flex weui-flex_align-center">\n      <div class="weui-flex__item discuss_user_info <# if (item.is_from_author) { #> discuss_author_info <# } #>" id="js_discuss_user_info_<# if (itemType === \'comment\') { #><#=item.content_id#><# } else { #><#=content_id#>_<#=item.reply_id#><# } #>"\n        <# if (canUseOption) { #>\n          role="option"\n          aria-labelledby="\n          js_discuss_user_info_<# if (itemType === \'comment\') { #><#=item.content_id#><# } else { #><#=content_id#>_<#=item.reply_id#><# } #>\n          js_a11y_colon\n          js_discuss_message_<# if (itemType === \'comment\') { #><#=item.content_id#><# } else { #><#=content_id#>_<#=item.reply_id#><# } #>"\n          aria-describedby="\n          js_discuss_message_status_<# if (itemType === \'comment\') { #><#=item.content_id#><# } else { #><#=content_id#>_<#=item.reply_id#><# } #>"\n        <# } #>\n        >\n        <div class="discuss_user_nickname"><#=item.nick_name#></div>\n        <# if (item.is_from_friend == 1) { #><span class="discuss_relation_tips"> (朋友)</span><# } #>\n        <# if (item.is_from_author) { #><span class="discuss_relation_tips"> (作者)</span><# } #>\n        <# if (typeof item.is_top === \'number\' && item.is_top == 1) { #><span class="icon_appmsg_tag">置顶</span><# } #>\n        <# if (!(type === \'mine\' && itemType === \'reply\' && canC2CReply) && deviceIsPc && !(item.is_elected == 1 || item.reply_is_elected == 1)) { #><span class="tips_global_primary">未精选</span><# } #>\n      </div>\n\n      <# if (!isWxWork) { #>\n        <# if (deviceIsPc) { #>\n          <!-- pc留言操作-->\n          <div class="discuss_opr discuss_opr_pc">\n            <# if (supportReply && (canC2CReply || (!canC2CReply && itemType === \'comment\' && item.is_from_me == 1))) { #>\n              <!-- 留言 输入框聚焦的时候discuss_opr_meta加commenting-->\n              <span title="回复" class="discuss_opr_meta discuss_opr_meta_comment">\n                <button class="sns_opr_btn sns_comment_btn js_<#=itemType#>_reply_pc"></button>\n              </span>\n            <# } #>\n\n            <!-- 更多 展开的时候discuss_opr_meta加openning -->\n            <span title="更多操作" class="discuss_opr_meta discuss_opr_meta_more">\n              <button class="sns_opr_btn sns_more_btn js_dropdown"></button>\n              <div class="discuss_dropdown <# if (type === \'mine\') { #>discuss_dropdown_pos_top_right<# } else { #>discuss_dropdown_pos_top_center<# } #>">\n                <# if (item.is_from_me == 1) { #>\n                  <div class="discuss_dropdown_item js_<#=itemType#>_del">删除</div>\n                <# } #>\n                <div class="discuss_dropdown_item js_<#=itemType#>_complain">投诉</div>\n              </div>\n            </span>\n\n            <# if (!(type === \'mine\' && itemType === \'reply\' && canC2CReply) && (item.is_elected == 1 || item.reply_is_elected == 1)) { #>\n              <span title="<# if ((itemType === \'comment\' && item.like_status == 1) || (itemType === \'reply\' && item.reply_like_status == 1)) { #>取消点赞<# } else { #>点赞<# } #>" class="discuss_opr_meta js_<#=itemType#>_praise <# if ((itemType === \'comment\' && item.like_status == 1) || (itemType === \'reply\' && item.reply_like_status == 1)) { #>praised<# } #>">\n                <button class="sns_opr_btn sns_praise_btn">\n                  <# if (itemType === \'comment\' && item.like_num_format !== 0) { #>\n                    <span class="sns_opr_num sns_opr_gap praise_num"><#=item.like_num_format#></span>\n                  <# } else if (itemType === \'reply\' && item.reply_like_num_format !== 0) { #>\n                    <span class="sns_opr_num sns_opr_gap praise_num"><#=item.reply_like_num_format#></span>\n                  <# } else { #>\n                    <span class="sns_opr_num sns_opr_gap praise_num"></span>\n                  <# } #>\n                </button>\n              </span>\n            <# } #>\n          </div>\n        <# } else { #>\n          <!-- 移动端留言操作-->\n          <div class="discuss_opr">\n            <# if (item.is_from_me == 1) { #>\n              <a role="button" class="weui-wa-hotarea_before discuss_opr_meta discuss_del js_<#=itemType#>_del">删除</a>\n            <# } #>\n\n            <# if (supportReply && (canC2CReply || (!canC2CReply && itemType === \'comment\' && item.is_from_me == 1))) { #>\n              <a role="button" class="weui-wa-hotarea_before discuss_opr_meta js_reply_btn js_can_reply" data-type="<#=itemType#>">回复</a>\n            <# } #>\n\n            <# if (!(type === \'mine\' && itemType === \'reply\' && canC2CReply)) { #>\n              <# if (item.is_elected == 1 || item.reply_is_elected == 1) { #>\n                <span class="discuss_opr_meta js_<#=itemType#>_praise <# if ((itemType === \'comment\' && item.like_status == 1) || (itemType === \'reply\' && item.reply_like_status == 1)) { #>praised<# } #>">\n                  <button class="weui-wa-hotarea sns_opr_btn sns_praise_btn">\n                    <span class="aria_hidden_abs">赞</span>\n                    <# if (itemType === \'comment\' && item.like_num_format !== 0) { #>\n                      <span class="sns_opr_num sns_opr_gap praise_num"><#=item.like_num_format#></span>\n                    <# } else if (itemType === \'reply\' && item.reply_like_num_format !== 0) { #>\n                      <span class="sns_opr_num sns_opr_gap praise_num"><#=item.reply_like_num_format#></span>\n                    <# } else { #>\n                      <span class="sns_opr_num sns_opr_gap praise_num"></span>\n                    <# } #>\n                  </button>\n                </span>\n              <# } else { #>\n                <span class="discuss_opr_meta">未精选</span>\n              <# } #>\n            <# } #>\n          </div>\n        <# } #>\n      <# } #>\n    </div>\n\n    <div <# if (canUseOption) { #> aria-hidden="true"<# } #> class="discuss_message">\n      <span class="discuss_status" id="js_discuss_message_status_<# if (itemType === \'comment\') { #><#=item.content_id#><# } else { #><#=content_id#>_<#=item.reply_id#><# } #>"><#=item.status#></span>\n      <div class="wx_folder js_folder_area">\n        <# if (type === \'reply\' && item.to_nick_name) { #>\n          <div id="js_discuss_message_<# if (itemType === \'comment\') { #><#=item.content_id#><# } else { #><#=content_id#>_<#=item.reply_id#><# } #>" class="discuss_message_content wx_folder_normal js_content">回复 <strong class="discuss_message_reply_nickname"><#=item.to_nick_name#></strong>：<#=item.content#></div>\n        <# } else { #>\n          <div id="js_discuss_message_<# if (itemType === \'comment\') { #><#=item.content_id#><# } else { #><#=content_id#>_<#=item.reply_id#><# } #>" class="discuss_message_content wx_folder_normal js_content"><#=item.content#></div>\n        <# } #>\n        <# if (type === \'comment\') { #>\n          <div aria-hidden="true" class="discuss_message_content wx_folder_fake js_fake_content"><#=item.content#></div>\n\n          <!-- 当normal和fake不等高的时候显示展开按钮 -->\n          <button aria-hidden="true" class="wx_folder_btn reset_btn js_folder" type="button" style="display: none;">展开</button>\n        <# } #>\n      </div>\n    </div>\n\n    <!-- 预览上次回复内容 -->\n    <!-- <# if (item.to_nick_name && item.to_content) { #>\n      <div class="discuss_reply_primary">\n        <div class="discuss_reply_primary_inner">\n          <# if (item.to_reply_del_flag === 0) { #>\n            <strong class="discuss_reply_nickname"><#=item.to_nick_name#>: </strong>\n            <p class="discuss_reply_content js_to_content"><#=item.to_content#></p>\n          <# } else { #>\n            <p class="discuss_reply_content">回复已删除</p>\n          <# } #>\n        </div>\n      </div>\n    <# } #> -->\n\n    <# if (type === \'comment\' || type === \'reply\') { #>\n      <div class="discuss_extra_info discuss_extra_info_primary">\n        <div class="discuss_extra_info_meta"><#=item.time#></div>\n        <# if (type === \'reply\' && !item.is_from_author && item.author_like_status) { #>\n          <div class="discuss_extra_info_meta">作者赞过</div>\n        <# } #>\n      </div>\n    <# } #>\n\n\n    <!-- pc回复留言输入框 -->\n    <div class="discuss_reply_form_area js_input_pc"></div>\n  </div>\n</div>\n';
+});define("appmsg/comment/comment_list/comment_item.html.js",[],function(){
+return'<li class="js_comment_item discuss_item cid<# if (item.is_from_me == 1) { #><#=item.my_id#><# } else { #><#=item.content_id#><# } #>"\n  id="cid<# if (item.is_from_me == 1) { #><#=item.my_id#><# } else { #><#=item.content_id#><# } #>"\n  data-elected="<#=item.report_elected#>"\n  data-friend="<#=item.report_friend#>"\n  data-my-id="<#=item.my_id#>"\n  data-content-id="<#=item.content_id#>"\n\n  <# if (isOversize) { #> style="display: none;" <# } #>\n>\n  <mp-comment-item></mp-comment-item> <!-- 这里只是一个占位符而已（即虚拟节点），最终会被替换成留言节点DOM（./item.html），由于是全匹配，所以不要随便改这个虚拟节点 -->\n\n  <# if (type !== \'comment\') { #>\n    <div class="discuss_reply_area">\n      <div class="discuss_reply js_reply_list">\n        <# if (item.reply_new && item.reply_new.reply_list && item.reply_new.reply_list.length > 0) { #>\n          <mp-reply-list></mp-reply-list> <!-- 这里只是一个占位符而已（即虚拟节点），最终会被替换成多个回复节点DOM（./item.html），由于是全匹配，所以不要随便改这个虚拟节点 -->\n        <# } #>\n      </div>\n\n      <# if (type !== \'mine\') { #>\n        <div class="discuss_extra_info js_more_reply" <# if (item.reply_new.reply_total_cnt === 0 || item.reply_new.reply_total_cnt === item.reply_new.reply_list.length) { #> style="display: none;" <# } #>>\n          <a href="javascript:;" role="button" class="dicuss_reply_more js_extend_comment weui-wa-hotarea_before">共<span class="js_reply_length"><#=item.reply_new.reply_total_cnt#></span>条回复</a>\n        </div>\n      <# } #>\n    </div>\n  <# } #>\n</li>\n';
+});define("common/actionSheet.js",["biz_wap/ui/weui.js","biz_wap/jsapi/core.js","common/navShadow.js","common/keyboard.js","biz_wap/utils/mmversion.js"],function(n){
+"use strict";
+n("biz_wap/ui/weui.js");
+var o=n("biz_wap/jsapi/core.js"),i=n("common/navShadow.js"),e=n("common/keyboard.js"),t=n("biz_wap/utils/mmversion.js"),c=!e.onlyUseH5Keyboard||t.isAndroid,a=function(n){
+var o=window.weui.actionSheet(n.buttons,[{
+label:"取消",
+onClick:function(){
+"function"==typeof n.onCancel&&n.onCancel();
+}
+}],{
+className:"weui-pop-zindex-primary",
+onClose:function(){
+i.hide(),"function"==typeof n.onClose&&n.onClose();
+},
+onClickMask:function(){
+"function"==typeof n.onCancel&&n.onCancel();
+}
+});
+i.show({
+onClick:function(){
+o.hide();
+}
+});
+};
+return{
+show:function(n){
+if(!c)return void a(n);
+var i={};
+o.invoke("handleMPPageAction",{
+action:"showActionSheet",
+buttons:n.buttons.map(function(n,o){
+var e=""+o;
+return i[e]=n.onClick,{
+id:e,
+label:n.label
+};
+})
+},function(o){
+/:ok$/.test(o.err_msg)?"function"==typeof i[o.id]&&i[o.id]():/:canceled$/.test(o.err_msg)?"function"==typeof n.onCancel&&n.onCancel():"action isn't supported"===o.err_desc||"action not support"===o.err_desc?a(n):"function"==typeof n.onFail&&n.onFail(o.err_msg);
+});
+}
+};
+});
