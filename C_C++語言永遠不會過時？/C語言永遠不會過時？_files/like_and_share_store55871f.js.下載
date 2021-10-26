@@ -1,0 +1,479 @@
+define("pages_new/common_share/video/player/controller.html.js",[],function(){
+return'<div :class="[\'mp-video-player\', fullscreenStatus === 101 ? \'opr_fade_out\' : \'\']">\n  <mp-video-player\n    v-if="errType === 0 && playerOpt"\n    ref="player"\n    :opt="playerOpt"\n    :wrap-style="wrapStyle"\n    :video-style="videoStyle"\n    :poster-style="posterStyle"\n    @loaded="onLoaded"\n    @timeupdate="onTimeupdate"\n    @begin-play="onBeginPlay"\n    @durationchange="onDurationchange"\n    @fullscreenchange="onFullscreenchange"\n    @status-change="onStatusChange"\n    @after-replay="onAfterReplay"\n    @hand-drag-complete="onHandDragComplete"\n    @bar-drag-complete="onBarDragComplete"\n    @end="onEnd"\n    @error="onError"\n    @first-buffering-time="onFirstBufferingTime"\n    @playing-buffering-time="onPlayingBufferingTime"\n    @flow-notice="onFlowNotice"\n    @userplay="onUserplay"\n    @userpause="onUserpause"\n    @waiting="onWaiting"\n    @play="onPlay"\n    @pause="onPause"\n    @mid-play-click="onMidPlayClick"\n    @after-check-video-fit="onAfterCheckVideoFit"\n    @bind-error="onBindError"\n    @rate-change="onRateChange"\n    @resolution-change="onResolutionChange"\n    @brightness-change="onBrightnessChange"\n    @volume-change="onVolumeChange"\n    @profile-jump="onProfileJump"\n    @process-state-change="onProcessStateChange"\n    @canplay="onCanplay"\n    @show-control-bar="onShowControlBar"\n    @hide-control-bar="onHideControlBar"\n    @show-menu="onShowMenu"\n    @replay="onReplay"\n    @touch-video="onTouchVideo"\n    @share-video="onShareVideo"\n    @praise-video="onPraiseVideo"\n    @like-video="onLikeVideo"\n    @open-source-page="onOpenSourcePage"\n    @show-subscribe="onShowSubscribe"\n    @click-subscribe="onClickSubscribe"\n    @enter-fullscreen="onEnterFullscreen"\n    @exit-fullscreen="onExitFullscreen"\n    @fast-forward="onFastForward"\n  >\n    <template #inner>\n      <component ref="innerPlugins" v-for="(plugin, idx) in innerPlugins" :key="idx" :is="plugin"></component>\n      <!-- 暂停吸顶提示 BEGIN -->\n      <div v-show="topStickyInfoStatus && !fullscreenStatus" class="video_poster__info__play"\n        :style="{ zIndex: topStickyInfoStatus > 200 ? -2 : \'\' }"\n        @click="topStickyInfoPlay"\n      ><i :class="topStickyInfoIconClass"></i></div>\n      <div v-show="topStickyInfoStatus && !fullscreenStatus" class="video_poster__info"\n        :style="{ zIndex: topStickyInfoStatus > 200 ? -2 : \'\' }"\n        @click="topStickyInfoPlay"\n      >\n        <p class="video_poster__info__title" style="font-size: 17px;">{{topStickyInfoWording}}</p>\n        <p class="video_poster__info__desc" style="font-size: 12px;">{{playerOpt && playerOpt.videoTitle || \'\'}}</p>\n      </div>\n      <div v-show="topStickyInfoStatus && !fullscreenStatus" class="video_poster__info__mask"\n        :style="{ width: topStickyInfoMaskWidth }"\n      ></div>\n      <!-- 暂停吸顶提示 END -->\n    </template>\n    <template #cover>\n      <component ref="coverPlugins" v-for="(plugin, idx) in coverPlugins" :key="idx" :is="plugin"></component>\n    </template>\n    <template #control>\n      <component ref="controlPlugins" v-for="(plugin, idx) in controlPlugins" :key="idx" :is="plugin"></component>\n    </template>\n  </mp-video-player>\n  <div v-else-if="errType === 1" class="wrp_pop_tips wx_video_error_box js_error_box">\n    <div class="wx_video_error_msg js_error_area">\n      <p role="heading">{{errMsg}}</p>\n      <i v-if="!opt.isMpVideo" class="wx_video_error_code">错误码：{{errCode}}</i>\n      <a v-if="refreshBtnStatus !== 0" class="wx_video_error_msg_btn js_video_errormsg_btn" role="button" href="javascript:void(0);" @click="reload">\n        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAqCAMAAADhynmdAAAAQlBMVEUAAACcnJycnJycnJyoqKicnJycnJycnJycnJycnJyfn5+cnJydnZ2enp6kpKSdnZ2cnJyenp6cnJycnJycnJybm5t8KrXMAAAAFXRSTlMAyeb3CNp3tJRvHIEtJhBgqztWRJ+p5TqGAAABCklEQVQ4y5WTi27DIAxFAUMhgTzX8/+/urB2pdKI0x0pSoRuruyLbf7gF3PBaDE6X44LyY0D1SJQsfd9PpMM/CJx60v8SmV1HMSi1lKyA1n0jnwWSO08l04uJbxpBmTrpDtbGB6fmxC6Tc4BHv9aZDJdJsHW9w43Jez9x8T5M4l31WZsJn2bsYY+nUum2lQkGIVANPZ4FCLWOJImSTgjZE2SkU9crmu57mj9JBc93Qzj9R1d3HSG5bN5MRsnUzcGKK8Ns02z+Da7rYQE4bUE2PG1C6kVnkCyf0pwX8/jwbyxCLhcHpKTFkvkwK3pRmXtRrVFoTGYLvN+t0EUl0qrRaF1pFBz0anp/ptvNB4SY1XDAVMAAAAASUVORK5CYII=" alt="" class="wx_video_error_refresh">\n        刷新      </a>\n    </div>\n    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADkAAAA5CAMAAAC7xnO3AAAAY1BMVEUAAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+aRQ2gAAAAIXRSTlMAOx20pMJbzBQNTDGTh2ohLCZmeUF2hEmXCFdxUquef4yHE17nAAACnklEQVRIx9WW2xqiIBSFRc1AUATJU1a+/1MOm0NYKvnNXM260ZLftRcbqCQinOLI0yiY/iXKuUZPjx5Fk+6RhF1yHiVF0wC6IZfr9fqIkpRqdNyQ9AoiUU8g+YZ8Xn96YmNKvkhkLMskKgEo/yJzaxkXeZsGsjeWKEIFU/FBZgA+D5yEwGtTgR0J18lYUvdcLZ1YkUjLf+a0saYYSG/J3Hury+WSkTCjCETtF6Mvd8QGJMZSWIfsAlKhWGRl5zQ1ZNBDgy/zzvvFavWUK7SyTRs+rsiUZS/4LHIHyo8VgBx7vDkKx2WhPS7dD1Q6cNlu2dTa0gMys4bz/vJR6ph8ADgcVcSVUkfnhzJTc6gRj8fbCOHk30UI2KC+V4gKjskJQqC5frFHli0kafogFIfFkAXVCSqdAFVR8pmtVCWiXCtaarbWpGtQAYx7sjf2GCbfjFRQpH7lTLucveSMBE7+Z6VqViT2/PVs0d7hPk9TUcTaUuVaT8k/f/v6SXOgyG7InZaSvM8vj/309LrbvpSAORDH2/kWGyHhm/u5AYUc8qdFBRRrsV749bRv6I5x1OY50GZUUxQz9aGplAXZcOQ1DL3vwsTyvHQ2YWgjZV2rDTmxYRjUuoBvcQDr7QRLBiiNzJ4BawG3FLtTmEMGBigTRyC2oIKht1vbwLWrKmXKBZal+yApDGhm4q5JCVdNdrZeQBe8B44WnE2NGmxrR1bCvMugHdkhSwMWI9wjIGeosnPlJmNrst6PQrpeFkBSyAmkdD016DYqAVC6HHcNtnCPgazcuytAd5IqB/qYtq4bkP7vnEaL3W4KH9/HhKBAKl8XFUlMIWYIek4hZgh6UtjHBLVA4pPkCKRf9jOQ5Kwp1UvPDyb3qkPJaRG8Ln7f8Q8Bki/Kj5IYnQAAAABJRU5ErkJggg==" class="wx_video_error_loading js_video_errormsg_loading" style="display:none;">\n  </div>\n  <div v-else-if="errType === 2" class="wrp_pop_tips wx_video_msg_primary js_error_box">\n    <div class="wx_video_msg_primary_inner">\n      <i class="weui-icon-info weui-icon_msg"></i>\n      <p class="wx_video_msg_primary_text">{{errMsg}}</p>\n    </div>\n  </div>\n  <div v-show="toastTips">\n    <div class="weui-mask_transparent"></div>\n    <div class="weui-toast" :style="{ top: orientationStatus === 0 ? \'45%\' : \'\' }">\n      <i class="weui-icon-success-no-circle weui-icon_toast"></i>\n      <p class="weui-toast__content">{{toastTips}}</p>\n    </div>\n  </div>\n</div>';
+});define("pages_new/common_share/video/player/plugins/hls_tips/hls_tips_store.js",[],function(){
+"use strict";
+return{
+name:"hls-tips-plugin",
+namespaced:!0,
+state:function(){
+return{
+hlsTipsStatus:0
+};
+},
+mutations:{
+setHlsTipsStatus:function(s,t){
+s.hlsTipsStatus=t.value;
+}
+}
+};
+});var _extends=Object.assign||function(e){
+for(var t=1;t<arguments.length;t++){
+var o=arguments[t];
+for(var n in o)Object.prototype.hasOwnProperty.call(o,n)&&(e[n]=o[n]);
+}
+return e;
+};
+define("pages_new/common_share/video/player/plugins/auto_next/auto_next_store.js",["biz_wap/jsapi/log.js","pages/utils.js","common/comm_report.js","biz_wap/utils/jsmonitor_report.js"],function(e){
+"use strict";
+var t=e("biz_wap/jsapi/log.js"),o=e("pages/utils.js"),n=e("common/comm_report.js"),s=e("biz_wap/utils/jsmonitor_report.js");
+return{
+name:"auto-next-plugin",
+namespaced:!0,
+state:function(){
+return{
+autoNextStatus:0
+};
+},
+getters:{
+nextVideo:function(e,t,o){
+var n=o.extRes;
+if(n.related_tag_video&&n.related_tag_video.length)for(var s=0;s<n.related_tag_video.length;s++){
+var a=n.related_tag_video[s];
+if(1!==a.user_read_status)return{
+source:1,
+vid:a.vid,
+url:a.url,
+recInfo:a.rec_info,
+title:a.title||"更多精彩视频",
+cover:a.cover||"",
+headImg:a.head_img_url||"",
+bizNickName:a.srcDisplayName||""
+};
+}
+return null;
+},
+report17149Data:function(e,t,n){
+var s=n.cgiData,a=n.extRes;
+return{
+BizUserName:s.biz,
+MsgId:1*s.mid,
+Idx:1*s.idx,
+EnterId:s.enterid,
+VideoId:s.vid,
+Scene:s.scene,
+Subscene:1*s.subscene,
+SessionIdStr:s.sessionid,
+ChannelSessionId:s.channel_session_id,
+ContinueId:s.continueid+"",
+ReloadId:s.reloadid+"",
+Device:s.devicetype,
+ContinueSource:t.nextVideo&&t.nextVideo.source||0,
+MoreVideosInfo:t.nextVideo&&o.getMoreVideoInfo(t.nextVideo.url,t.nextVideo.vid)||"",
+VideoRecommendType:a.video_recommend_type||0,
+MoreVideoSortId:a.more_video_sort_id||0,
+MoreVideosSeq:s.continueseq,
+MoreVideoRecInfo:t.nextVideo&&t.nextVideo.recInfo||""
+};
+}
+},
+mutations:{
+setAutoNextStatus:function(e,t){
+e.autoNextStatus=t.value;
+}
+},
+actions:{
+cancelAutoNext:function(e,o){
+var n=e.commit,s=e.state,a=e.dispatch;
+0===s.autoNextStatus?(n("setAutoNextStatus",{
+value:4
+}),console.log("[AutoNext Plugin] Cancel autonext for reason "+o+" before tips show"),
+t.info("cancel autonext for reason "+o+" before tips show")):a("cancelAutoNextWhenTipsShowed",o);
+},
+resumeAutoNext:function(e){
+var o=e.commit,n=e.state;
+4===n.autoNextStatus&&(o("setAutoNextStatus",{
+value:0
+}),console.log("[AutoNext Plugin] Resume autonext"),t.info("resume autonext"));
+},
+cancelAutoNextWhenTipsShowed:function(e,o){
+var n=e.dispatch,a=e.state;
+if(1===a.autoNextStatus){
+n("hideTips");
+var i=function(){
+s.setSum(221764,28,1),n("report17149",{
+EventType:87,
+ContinueBreakReason:o
+});
+};
+3===o?setTimeout(i):i(),console.log("[AutoNext Plugin] Cancel autonext for reason "+o+" when tips showed"),
+t.info("cancel autonext for reason "+o+" when tips showed");
+}
+},
+showTips:function(e){
+var t=e.dispatch,o=e.commit,n=e.state;
+0===n.autoNextStatus&&(o("setAutoNextStatus",{
+value:1
+}),s.setSum(221764,25,1),t("report17149",{
+EventType:86
+}));
+},
+hideTips:function(e){
+var t=e.commit,o=e.state;
+1===o.autoNextStatus&&t("setAutoNextStatus",{
+value:3
+});
+},
+report17149:function(e,t){
+var o=e.getters,s=_extends({},o.report17149Data,t);
+n.report(17149,s);
+}
+}
+};
+});define("pages_new/common_share/video/player/plugins/after_ad/after_ad_store.js",[],function(){
+"use strict";
+return{
+name:"after-ad-plugin",
+namespaced:!0,
+state:function(){
+return{
+afterAdStatus:0
+};
+},
+mutations:{
+setAfterAdStatus:function(t,e){
+t.afterAdStatus=e.value;
+}
+}
+};
+});define("pages_new/common_share/video/player/plugins/mid_ad/mid_ad_store.js",[],function(){
+"use strict";
+return{
+name:"mid-ad-plugin",
+namespaced:!0,
+state:function(){
+return{
+midAdStatus:0
+};
+},
+mutations:{
+setMidAdStatus:function(t,e){
+t.midAdStatus=e.value;
+}
+}
+};
+});define("pages_new/common_share/video/player/plugins/popup/popup_store.js",[],function(){
+"use strict";
+function t(t){
+var p=Math.floor(t),u=Math.ceil(t);
+return t>p&&p+.5>t?p+.5:t>p+.5&&u>t?u:t;
+}
+return{
+name:"popup-plugin",
+namespaced:!0,
+state:function(){
+return{
+currentPopupIdx:-1,
+popupData:null
+};
+},
+getters:{
+currentPopup:function(t){
+var p=t.popupData&&t.popupData[t.currentPopupIdx];
+return p&&2!==p.status?p:null;
+}
+},
+mutations:{
+setCurrentPopupIdx:function(t,p){
+t.currentPopupIdx=p.value;
+},
+setPopupStatus:function(t,p){
+var u=p.index||t.currentPopupIdx,e=t.popupData&&t.popupData[u];
+e&&(e.status=p.value);
+},
+setPopupData:function(p,u){
+p.popupData=u.value.dots.map(function(p){
+var u={},e={};
+try{
+u=JSON.parse(p.dot);
+}catch(n){}
+try{
+e=JSON.parse(p.position);
+}catch(n){}
+return{
+status:0,
+info:u,
+id:p.id,
+type:p.type,
+position:e,
+startTime:t(1*p.begin_time),
+endTime:t(1*p.end_time)
+};
+});
+}
+}
+};
+});define("pages_new/modules/reward/reward_store.js",[],function(){
+"use strict";
+return{
+name:"mp-reward",
+namespaced:!0
+};
+});var _slicedToArray=function(){
+function e(e,t){
+var n=[],o=!0,r=!1,m=void 0;
+try{
+for(var a,i=e[Symbol.iterator]();!(o=(a=i.next()).done)&&(n.push(a.value),!t||n.length!==t);o=!0);
+}catch(s){
+r=!0,m=s;
+}finally{
+try{
+!o&&i["return"]&&i["return"]();
+}finally{
+if(r)throw m;
+}
+}
+return n;
+}
+return function(t,n){
+if(Array.isArray(t))return t;
+if(Symbol.iterator in Object(t))return e(t,n);
+throw new TypeError("Invalid attempt to destructure non-iterable instance");
+};
+}(),_extends=Object.assign||function(e){
+for(var t=1;t<arguments.length;t++){
+var n=arguments[t];
+for(var o in n)Object.prototype.hasOwnProperty.call(n,o)&&(e[o]=n[o]);
+}
+return e;
+};
+define("pages_new/modules/comment/comment_store.js",["pages_new/3rd/vue.js","common/keyboard.js","common/utils.js","biz_wap/utils/mmversion.js","biz_wap/utils/jsmonitor_report.js"],function(e){
+"use strict";
+var t=e("pages_new/3rd/vue.js"),n=e("common/keyboard.js"),o=e("common/utils.js"),r=e("biz_wap/utils/mmversion.js"),m=e("biz_wap/utils/jsmonitor_report.js"),a="http://mmbiz.qpic.cn/mmbiz/a5icZrUmbV8p5jb6RZ8aYfjfS2AVle8URwBt8QIu6XbGewB9wiaWYWkPwq4R7pfdsFibuLkic16UcxDSNYtB8HnC1Q/0";
+return{
+name:"mp-comment",
+namespaced:!0,
+state:function(){
+return{
+isVoiceover:!1,
+writeStatus:0,
+myCommentData:null,
+myCommentStatus:0,
+commentData:null,
+commentStatus:0,
+commentVersion:function(){
+return r.isWechat?r.isInMiniProgram?0:n.canUseKeyboard?2:(r.isIOS||r.isAndroid)&&(r.gtVersion("7.0.8")||o.isNativePage())?2:0:0;
+}(),
+offset:0,
+replyFlag:0,
+warningToast:"",
+reportData:{
+scene:0,
+idkey:"",
+moreList:27,
+repeatList:25,
+errList:18,
+handleList:26,
+addCommentErr:19,
+errComment:18,
+repeatContent:24,
+repeatContentID:23
+}
+};
+},
+getters:{
+tempKey:function(e,t,n){
+return n.cgiData.tempkey||"";
+},
+commentId:function(e,t,n){
+return n.cgiData.comment_id||"";
+},
+commentEnabled:function(e,t,n){
+return n.extRes.comment_enabled||0;
+},
+commentCount:function(e,t,n){
+return n.extRes.comment_count;
+},
+nickName:function(e,t,n){
+return n.extRes.nick_name||"";
+},
+headImg:function(e,t,n){
+return n.extRes.logo_url||a;
+},
+isFans:function(e,t,n){
+return n.extRes.is_fans||0;
+},
+isFansDays:function(e,t,n){
+return n.extRes.is_fans_days||0;
+},
+onlyFansCanComment:function(e,t,n){
+return n.extRes.only_fans_can_comment||0;
+},
+onlyFansDaysCanComment:function(e,t,n){
+return n.extRes.only_fans_days_can_comment||0;
+},
+canC2cReply:function(e,t,n){
+return!!n.extRes.test_flag&&0!==(256&n.extRes.test_flag);
+}
+},
+mutations:{
+setIsVoiceover:function(e,t){
+e.isVoiceover=t.value;
+},
+setCommentVersion:function(e,t){
+e.commentVersion=t.value;
+},
+setWriteStatus:function(e,t){
+e.writeStatus=t.status;
+},
+setMyCommentData:function(e,t){
+e.myCommentData=t.data;
+},
+setMyCommentStatus:function(e,t){
+e.myCommentStatus=t.status;
+},
+setCommentData:function(e,t){
+e.commentData=t.data;
+},
+setCommentLike:function(e,t){
+var n=t.type,o=void 0===n?"mine":n,r=t.commentIdx,m=t.replyIdx,a=t.likeStatus,i="mine"===o?e.myCommentData.my_comment:e.commentData.elected_comment;
+if("number"==typeof r&&"undefined"==typeof m){
+var s=i[r];
+s&&s.like_status!==a&&(s.like_status=a,s.like_num+=a?1:-1);
+}else if("number"==typeof r&&"number"==typeof m){
+var s=i[r],u=s.reply_new.reply_list[m];
+u&&u.reply_like_status!==a&&(u.reply_like_status=a,u.reply_like_num+=a?1:-1,s.reply_new=_extends({},s.reply_new));
+}
+},
+setAnimationStatus:function(e,t){
+var n=t.type,o=void 0===n?"mine":n,r=t.commentIdx,m=t.replyIdx,a="mine"===o?e.myCommentData.my_comment:e.commentData.elected_comment;
+if("number"==typeof r&&"undefined"==typeof m){
+var i=a[r];
+i&&(i.needAnimation=!1);
+}else if("number"==typeof r&&"number"==typeof m){
+var i=a[r],s=i.reply_new.reply_list[m];
+s&&(s.needAnimation=!1);
+}
+},
+addComment:function(e,n){
+var o=n.type,r=void 0===o?"mine":o,m=n.commentItem,a=n.commentIdx,i=n.replyItem,s=n.replyIdx,u="mine"===r?e.myCommentData.my_comment:e.commentData.elected_comment;
+if("undefined"!=typeof m)u.unshift(m);else if("number"==typeof a&&"undefined"!=typeof i){
+var c=u[a];
+c&&(c.reply_new?("number"==typeof s?c.reply_new.reply_list.splice(s+1,0,i):c.reply_new.reply_list.unshift(i),
+c.reply_new.reply_total_cnt++,c.reply_new=_extends({},c.reply_new)):t.set(c,"reply_new",{
+reply_list:[i],
+reply_total_cnt:1
+}));
+}
+},
+removeComment:function(e,t){
+var n=t.type,o=void 0===n?"mine":n,r=t.commentIdx,m=t.replyIdx,a="mine"===o?e.myCommentData.my_comment:e.commentData.elected_comment;
+if("number"==typeof r&&"undefined"==typeof m)a.splice(r,1);else if("number"==typeof r&&"number"==typeof m){
+var i=a[r];
+i&&(i.reply_new.reply_list.splice(m,1),i.reply_new.reply_total_cnt--,i.reply_new=_extends({},i.reply_new));
+}
+},
+updateCommentReplyInfo:function(e,t){
+var n=t.commentIdx,o=t.key,r=t.value;
+if("number"==typeof n){
+var m=e.commentData.elected_comment[n];
+m&&m.reply_new&&o in m.reply_new&&(m.reply_new[o]=r,m.reply_new=_extends({},m.reply_new));
+}
+},
+setCommentStatus:function(e,t){
+e.commentStatus=t.status;
+},
+setOffset:function(e,t){
+e.offset=t.value;
+},
+setReplyFlag:function(e,t){
+e.replyFlag=t.flag;
+},
+setReportData:function(e,t){
+e.reportData=t.data;
+},
+setWarningToast:function(e,t){
+e.warningToast=t.content;
+}
+},
+actions:{
+myReport:function(e,t){
+var n=e.state,o=_slicedToArray(t,2),r=o[0],a=o[1],i=void 0===a?"":a;
+if("undefined"!=typeof r)if(n.reportData.idkey)m.setSum(n.reportData.idkey,r,1);else{
+var s=new Image,u=Math.random();
+s.src="/mp/jsreport?key="+r+"&content="+i+"&r="+u;
+}
+}
+}
+};
+});define("pages_new/common_share/video/topic/topic_store.js",[],function(){
+"use strict";
+return{
+name:"mp-topic",
+namespaced:!0,
+state:function(){
+return{
+reportStatus:[]
+};
+},
+getters:{
+list:function(t,e,n){
+var r=n.cgiData.topics||[];
+return r;
+},
+reportStatus:function(t){
+return t.reportStatus;
+},
+hasDesc:function(t,e,n){
+return!!n.cgiData.msg_desc;
+},
+canReward:function(t,e,n){
+return n.cgiData.is_need_reward;
+}
+},
+mutations:{
+REPORT_ITEM:function(t,e){
+t.reportStatus[e]=!0;
+}
+},
+actions:{
+reportItem:function(t,e){
+t.commit("REPORT_ITEM",e);
+}
+}
+};
+});define("pages_new/common_share/video/like_and_share/like_and_share_store.js",["pages_new/common_share/video/like_and_share/actions.js","pages_new/common_share/video/like_and_share/mutations.js","biz_wap/jsapi/core.js","biz_wap/utils/mmversion.js","biz_wap/utils/device.js"],function(e){
+"use strict";
+var s=e("pages_new/common_share/video/like_and_share/actions.js"),a=e("pages_new/common_share/video/like_and_share/mutations.js"),t=e("biz_wap/jsapi/core.js"),i=e("biz_wap/utils/mmversion.js"),n=e("biz_wap/utils/device.js");
+return{
+name:"mp-like-and-share",
+namespaced:!0,
+getters:{
+hasExtReqDone:function(e,s,a){
+var i=a.extRes;
+return i.appmsgstat&&t.invoke("handleHaokanAction",{
+imgUrl:a.cgiData.round_head_img?a.cgiData.round_head_img:"",
+link:a.cgiData.msg_link.html(!1),
+desc:a.cgiData.msg_desc||"",
+title:a.cgiData.msg_title,
+action:"update_recommend_status",
+permission:a.cgiData.is_temp_url||a.extRes.appmsgstat.show_like_gray||!a.extRes.appmsgstat.show_like||2!==a.cgiData.appmsg_like_type?0:1,
+recommend:a.extRes.appmsgstat.liked?1:0
+},function(){}),!!i.appmsgstat;
+},
+test:function(e,s,a){
+return a.extRes;
+},
+collectShow:function o(e,s,a){
+var o=!1;
+return(i.isWechat&&(n.os.iphone&&i.getInner()>"17001000"||n.os.android&&i.getInner()>"27001300")||n.os.windows&&i.getInner()>="63010000")&&(o=!0),
+o&&a.extRes.share_flag.show;
+},
+shareShow:function r(e,s,a){
+var r=!1;
+return n.os.pc?n.os.windows&&i.getInner()>="63010000"&&(r=!0):r=!0,r&&a.extRes.share_flag.show;
+}
+},
+mutations:a,
+actions:s
+};
+});
